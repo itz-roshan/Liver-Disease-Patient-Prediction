@@ -35,11 +35,13 @@ def load_model():
     as this app.py file.
     """
 
-    if not os.path.exists(MODEL_PATH):
+    if not os.path.isfile(MODEL_PATH):
         raise FileNotFoundError(
             f"Model file not found: {MODEL_PATH}"
         )
 
+    # compile=False avoids needing optimizer/training state
+    # just to perform inference.
     return keras.models.load_model(
         MODEL_PATH,
         compile=False
@@ -50,16 +52,13 @@ try:
     model = load_model()
 
 except Exception as e:
-
     st.error("❌ Unable to load model.keras")
-
     st.warning(
         "Please make sure model.keras is present in the "
-        "same folder as app.py."
+        "same folder as app.py and that the TensorFlow/Keras "
+        "versions used for deployment are compatible with the model."
     )
-
     st.code(str(e))
-
     st.stop()
 
 
@@ -88,7 +87,6 @@ st.divider()
 info1, info2, info3 = st.columns(3)
 
 with info1:
-
     st.info(
         """
         👤 **Patient Information**
@@ -97,9 +95,7 @@ with info1:
         """
     )
 
-
 with info2:
-
     st.info(
         """
         🧪 **Laboratory Tests**
@@ -108,9 +104,7 @@ with info2:
         """
     )
 
-
 with info3:
-
     st.info(
         """
         🤖 **AI Prediction**
@@ -133,12 +127,9 @@ st.caption(
     "Enter the patient's basic demographic information."
 )
 
-
 patient_col1, patient_col2 = st.columns(2)
 
-
 with patient_col1:
-
     age = st.number_input(
         "Age",
         min_value=4,
@@ -147,15 +138,10 @@ with patient_col1:
         step=1
     )
 
-
 with patient_col2:
-
     gender = st.selectbox(
         "Gender",
-        [
-            "Male",
-            "Female"
-        ]
+        ["Male", "Female"]
     )
 
 
@@ -179,9 +165,7 @@ st.caption(
 
 col1, col2 = st.columns(2)
 
-
 with col1:
-
     total_bilirubin = st.number_input(
         "Total Bilirubin",
         min_value=0.4,
@@ -191,9 +175,7 @@ with col1:
         format="%.2f"
     )
 
-
 with col2:
-
     direct_bilirubin = st.number_input(
         "Direct Bilirubin",
         min_value=0.1,
@@ -210,9 +192,7 @@ with col2:
 
 col1, col2 = st.columns(2)
 
-
 with col1:
-
     alkaline_phosphotase = st.number_input(
         "Alkaline Phosphotase",
         min_value=63,
@@ -221,9 +201,7 @@ with col1:
         step=1
     )
 
-
 with col2:
-
     alamine = st.number_input(
         "Alamine Aminotransferase",
         min_value=10,
@@ -239,9 +217,7 @@ with col2:
 
 col1, col2 = st.columns(2)
 
-
 with col1:
-
     aspartate = st.number_input(
         "Aspartate Aminotransferase",
         min_value=10,
@@ -250,9 +226,7 @@ with col1:
         step=1
     )
 
-
 with col2:
-
     total_proteins = st.number_input(
         "Total Proteins",
         min_value=2.7,
@@ -269,9 +243,7 @@ with col2:
 
 col1, col2 = st.columns(2)
 
-
 with col1:
-
     albumin = st.number_input(
         "Albumin",
         min_value=0.9,
@@ -281,9 +253,7 @@ with col1:
         format="%.2f"
     )
 
-
 with col2:
-
     ag_ratio = st.number_input(
         "Albumin and Globulin Ratio",
         min_value=0.3,
@@ -298,16 +268,12 @@ st.write("")
 
 
 # ============================================================
-# BUTTONS
+# BUTTON
 # ============================================================
 
-button_col1, button_col2, button_col3 = st.columns(
-    [1, 2, 1]
-)
-
+button_col1, button_col2, button_col3 = st.columns([1, 2, 1])
 
 with button_col2:
-
     predict_button = st.button(
         "🔍 Analyze Patient",
         type="primary",
@@ -329,10 +295,7 @@ if predict_button:
     # Female = 1
     # --------------------------------------------------------
 
-    if gender == "Male":
-        gender_value = 0
-    else:
-        gender_value = 1
+    gender_value = 0 if gender == "Male" else 1
 
 
     # --------------------------------------------------------
@@ -363,12 +326,10 @@ if predict_button:
     # --------------------------------------------------------
 
     if input_data.shape != (1, 10):
-
         st.error(
             "❌ Input format error. "
             "Model requires exactly 10 features."
         )
-
         st.stop()
 
 
@@ -377,32 +338,19 @@ if predict_button:
     # --------------------------------------------------------
 
     try:
-
-        with st.spinner(
-            "🤖 Analyzing patient data..."
-        ):
-
+        with st.spinner("🤖 Analyzing patient data..."):
             prediction = model.predict(
                 input_data,
                 verbose=0
             )
 
-
-        # Convert prediction to scalar
-
         model_output = float(
             np.asarray(prediction).reshape(-1)[0]
         )
 
-
     except Exception as e:
-
-        st.error(
-            "❌ Prediction failed."
-        )
-
+        st.error("❌ Prediction failed.")
         st.code(str(e))
-
         st.stop()
 
 
@@ -418,19 +366,11 @@ if predict_button:
     # --------------------------------------------------------
     # DECISION
     #
-    # Existing notebook model uses 0.50 threshold.
+    # Existing application logic uses 0.50 threshold.
     # --------------------------------------------------------
 
     threshold = 0.50
-
-
-    if model_output >= threshold:
-
-        disease_detected = True
-
-    else:
-
-        disease_detected = False
+    disease_detected = model_output >= threshold
 
 
     # --------------------------------------------------------
@@ -438,7 +378,6 @@ if predict_button:
     # --------------------------------------------------------
 
     if disease_detected:
-
         st.error(
             """
             ## ⚠️ Liver Disease Indicated
@@ -447,9 +386,7 @@ if predict_button:
             decision threshold.
             """
         )
-
     else:
-
         st.success(
             """
             ## ✅ Lower Risk Indicated
@@ -469,41 +406,25 @@ if predict_button:
 
     st.subheader("Prediction Summary")
 
-
     result_col1, result_col2, result_col3 = st.columns(3)
 
-
     with result_col1:
-
         st.metric(
             "Model Output",
             f"{model_output:.3f}"
         )
 
-
     with result_col2:
-
         st.metric(
             "Decision Threshold",
             f"{threshold:.3f}"
         )
 
-
     with result_col3:
-
-        if disease_detected:
-
-            st.metric(
-                "Prediction",
-                "Disease Indicated"
-            )
-
-        else:
-
-            st.metric(
-                "Prediction",
-                "Lower Risk"
-            )
+        st.metric(
+            "Prediction",
+            "Disease Indicated" if disease_detected else "Lower Risk"
+        )
 
 
     # ========================================================
@@ -512,40 +433,25 @@ if predict_button:
 
     st.write("")
 
-
-    with st.expander(
-        "📋 View Patient Information"
-    ):
+    with st.expander("📋 View Patient Information"):
 
         st.subheader("Patient")
 
         p1, p2 = st.columns(2)
 
-
         with p1:
-
-            st.write(
-                f"**Age:** {age}"
-            )
-
+            st.write(f"**Age:** {age}")
 
         with p2:
-
-            st.write(
-                f"**Gender:** {gender}"
-            )
-
+            st.write(f"**Gender:** {gender}")
 
         st.divider()
 
         st.subheader("Laboratory Values")
 
-
         l1, l2 = st.columns(2)
 
-
         with l1:
-
             st.write(
                 f"**Total Bilirubin:** "
                 f"{total_bilirubin:.2f}"
@@ -566,9 +472,7 @@ if predict_button:
                 f"{albumin:.2f}"
             )
 
-
         with l2:
-
             st.write(
                 f"**Direct Bilirubin:** "
                 f"{direct_bilirubin:.2f}"
@@ -594,9 +498,7 @@ if predict_button:
     # MODEL INPUT PREVIEW
     # ========================================================
 
-    with st.expander(
-        "🔧 View Model Input"
-    ):
+    with st.expander("🔧 View Model Input"):
 
         st.write(
             "The following 10 values are sent to the model:"
