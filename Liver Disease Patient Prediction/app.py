@@ -1,7 +1,7 @@
+import os
 import streamlit as st
 import numpy as np
-import joblib
-import os
+from tensorflow import keras
 
 
 # ============================================================
@@ -17,27 +17,45 @@ st.set_page_config(
 
 
 # ============================================================
+# PATH CONFIGURATION
+# ============================================================
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "model.keras")
+
+
+# ============================================================
 # LOAD TRAINED MODEL
 # ============================================================
 
 @st.cache_resource
 def load_model():
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    model_path = os.path.join(base_dir, "model.pkl")
-    return joblib.load(model_path)
+    """
+    Load the trained Keras model from the same directory
+    as this app.py file.
+    """
+
+    if not os.path.exists(MODEL_PATH):
+        raise FileNotFoundError(
+            f"Model file not found: {MODEL_PATH}"
+        )
+
+    return keras.models.load_model(
+        MODEL_PATH,
+        compile=False
+    )
 
 
 try:
-
     model = load_model()
 
 except Exception as e:
 
-    st.error("❌ Unable to load model.pkl")
+    st.error("❌ Unable to load model.keras")
 
     st.warning(
-        "Make sure model.pkl is present in the same "
-        "folder as app.py."
+        "Please make sure model.keras is present in the "
+        "same folder as app.py."
     )
 
     st.code(str(e))
@@ -68,7 +86,6 @@ st.divider()
 # ============================================================
 
 info1, info2, info3 = st.columns(3)
-
 
 with info1:
 
@@ -292,7 +309,7 @@ button_col1, button_col2, button_col3 = st.columns(
 with button_col2:
 
     predict_button = st.button(
-        "🔍  Analyze Patient",
+        "🔍 Analyze Patient",
         type="primary",
         use_container_width=True
     )
@@ -313,11 +330,8 @@ if predict_button:
     # --------------------------------------------------------
 
     if gender == "Male":
-
         gender_value = 0
-
     else:
-
         gender_value = 1
 
 
@@ -345,7 +359,7 @@ if predict_button:
 
 
     # --------------------------------------------------------
-    # SHOW INPUT SHAPE
+    # VALIDATE INPUT SHAPE
     # --------------------------------------------------------
 
     if input_data.shape != (1, 10):
@@ -404,8 +418,7 @@ if predict_button:
     # --------------------------------------------------------
     # DECISION
     #
-    # Existing notebook model uses linear output.
-    # For this application we use 0.50 as decision threshold.
+    # Existing notebook model uses 0.50 threshold.
     # --------------------------------------------------------
 
     threshold = 0.50
@@ -498,6 +511,7 @@ if predict_button:
     # ========================================================
 
     st.write("")
+
 
     with st.expander(
         "📋 View Patient Information"
@@ -613,5 +627,3 @@ st.caption(
     "For educational and demonstration purposes only. "
     "This application is not a medical diagnosis tool."
 )
-
-# streamlit run app.py
