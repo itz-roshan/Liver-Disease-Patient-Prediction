@@ -120,6 +120,7 @@ liver-disease-prediction/
 ├── Liver Disease Patient Prediction.ipynb   # EDA + model training notebook
 ├── model.pkl                          # Trained ANN model (Keras, saved via joblib)
 ├── app.py                             # Streamlit web app (UI + inference)
+├── requirements.txt                           
 └── README.md                          # Project documentation
 ```
 
