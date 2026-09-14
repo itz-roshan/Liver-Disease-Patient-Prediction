@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import joblib
+import os
 
 
 # ============================================================
@@ -21,8 +22,9 @@ st.set_page_config(
 
 @st.cache_resource
 def load_model():
-
-    return joblib.load("model.pkl")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(base_dir, "model.pkl")
+    return joblib.load(model_path)
 
 
 try:
