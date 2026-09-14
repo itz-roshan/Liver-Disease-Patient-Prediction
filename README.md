@@ -32,19 +32,15 @@ The project covers the **complete ML lifecycle**:
 
 ## 🚀 Live Demo
 
-> ### 👉 **[Click here to try the live app](https://your-app-name.streamlit.app)** 👈
+> ### 👉 **[Click here to try the live app](https://roshan-liver-disease-patient-prediction.streamlit.app/)** 👈
 
-*(Replace the link above with your own Streamlit Community Cloud URL once deployed — see [Deployment](#-deploy-your-own-live-link) below. The app runs entirely in-browser and opens directly in Chrome or any modern browser.)*
+ 
 
 ---
 
 ## 📸 Preview
 
-| Input Form | Prediction Result |
-|:---:|:---:|
-| Enter patient clinical parameters | Instant ANN-powered prediction with confidence score |
-
-*(Add your own screenshots/GIF here — e.g. `assets/demo.gif` — once you run the app locally.)*
+<img src="prediction.png" alt="LiverCare AI" width="800">
 
 ---
 
